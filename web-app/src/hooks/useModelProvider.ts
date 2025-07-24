@@ -50,6 +50,16 @@ export const useModelProvider = create<ModelProviderState>()(
                 ),
               }
             })
+          let legacyModels: Model[] | undefined = []
+          /// Cortex Migration
+          if (
+            localStorage.getItem('cortex_model_settings_migrated') !== 'true'
+          ) {
+            legacyModels = state.providers.find(
+              (e) => e.provider === 'llama.cpp'
+            )?.models
+            localStorage.setItem('cortex_model_settings_migrated', 'true')
+          }
           // Ensure deletedModels is always an array
           const currentDeletedModels = Array.isArray(state.deletedModels)
             ? state.deletedModels
@@ -75,11 +85,19 @@ export const useModelProvider = create<ModelProviderState>()(
               ...models,
             ]
             const updatedModels = provider.models?.map((model) => {
+              const settings =
+                (legacyModels && legacyModels?.length > 0
+                  ? legacyModels
+                  : models
+                ).find(
+                  (m) =>
+                    m.id.replace(/:/g, '/') ===
+                    model.id.replace('cortex.so/', '')
+                )?.settings || model.settings
+
               return {
                 ...model,
-                settings:
-                  models.find((m) => m.id === model.id)?.settings ||
-                  model.settings,
+                settings,
               }
             })
             return {
