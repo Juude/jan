@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react'
 import { events } from '@janhq/core'
 import { useModelProvider } from '@/hooks/useModelProvider'
 import { getProviders } from '@/services/providers'
+import { useLlamacppDeviceGpus } from '@/hooks/useLlamacppDeviceGpus'
 
 /**
  * GlobalEventHandler handles global events that should be processed across all screens
@@ -9,6 +11,7 @@ import { getProviders } from '@/services/providers'
  */
 export function GlobalEventHandler() {
   const { setProviders } = useModelProvider()
+  const { refetch } = useLlamacppDeviceGpus()
 
   // Handle settingsChanged event globally
   useEffect(() => {
@@ -48,6 +51,22 @@ export function GlobalEventHandler() {
       events.off('settingsChanged', handleSettingsChanged)
     }
   }, [setProviders])
+
+  // Listen for devicesUpdated event from the backend
+  useEffect(() => {
+    const handleDevicesUpdated = (event: { devices: any[] }) => {
+      console.log('Devices updated event received:', event)
+      refetch()
+    }
+
+    // Subscribe to the devicesUpdated event
+    events.on('devicesUpdated', handleDevicesUpdated)
+
+    // Cleanup subscription on unmount
+    return () => {
+      events.off('devicesUpdated', handleDevicesUpdated)
+    }
+  }, [refetch])
 
   // This component doesn't render anything
   return null

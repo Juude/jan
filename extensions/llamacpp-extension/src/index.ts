@@ -1503,6 +1503,15 @@ export default class llamacpp_extension extends AIEngine {
         backendPath,
         libraryPath,
       })
+      
+      // Emit for updating fe
+      if (events && typeof events.emit === 'function') {
+        logger.info('Emitting devicesUpdated event for frontend refetch')
+        events.emit('devicesUpdated', {
+          devices: dList,
+        })
+      }
+      
       return dList
     } catch (error) {
       logger.error('Failed to query devices:\n', error)

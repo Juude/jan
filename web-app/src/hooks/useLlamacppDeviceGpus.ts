@@ -21,48 +21,30 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
       const updatedDevices = prevDevices.map((device) =>
         device.id === id ? { ...device, active: !device.active } : device
       )
-      localStorage.setItem(localStorageKey.llamacppDeviceGpus, JSON.stringify(updatedDevices))
+      localStorage.setItem(
+        localStorageKey.llamacppDeviceGpus,
+        JSON.stringify(updatedDevices)
+      )
       return updatedDevices
     })
   }
 
   const refetch = () => {
-    setRefetchTrigger(prev => prev + 1)
-  }
-
-  const fetchDevicesWithRetry = async (retries = 3, delay = 2000): Promise<DeviceList[]> => {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const devices = await getLlamacppDevices()
-        if (devices.length > 0) {
-          return devices
-        }
-        // If empty array and not the last retry, wait and try again
-        if (i < retries - 1) {
-          console.log(`Device fetch returned empty, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`)
-          await new Promise(resolve => setTimeout(resolve, delay))
-        }
-      } catch (error) {
-        if (i === retries - 1) {
-          throw error
-        }
-        console.log(`Device fetch failed, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`)
-        await new Promise(resolve => setTimeout(resolve, delay))
-      }
-    }
-    return []
+    setRefetchTrigger((prev) => prev + 1)
   }
 
   useEffect(() => {
     let isMounted = true
     setLoading(true)
-    fetchDevicesWithRetry()
+    getLlamacppDevices()
       .then((devs) => {
         if (isMounted) {
           // Load persisted device states from localStorage
-          const persistedDevices = localStorage.getItem(localStorageKey.llamacppDeviceGpus)
+          const persistedDevices = localStorage.getItem(
+            localStorageKey.llamacppDeviceGpus
+          )
           let devicesWithState: DeviceList[]
-          
+
           // If API returns empty array, keep existing localStorage data
           if (devs.length === 0) {
             if (persistedDevices) {
@@ -84,7 +66,7 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
               return
             }
           }
-          
+
           if (persistedDevices) {
             try {
               const parsed = JSON.parse(persistedDevices) as DeviceList[]
@@ -93,7 +75,7 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
                 const persistedDevice = parsed.find((p) => p.id === device.id)
                 return {
                   ...device,
-                  active: persistedDevice?.active ?? true
+                  active: persistedDevice?.active ?? true,
                 }
               })
             } catch {
@@ -104,9 +86,12 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
             // Set all devices' active to true by default
             devicesWithState = devs.map((d) => ({ ...d, active: true }))
           }
-          
+
           setDevices(devicesWithState)
-          localStorage.setItem(localStorageKey.llamacppDeviceGpus, JSON.stringify(devicesWithState))
+          localStorage.setItem(
+            localStorageKey.llamacppDeviceGpus,
+            JSON.stringify(devicesWithState)
+          )
           setLoading(false)
         }
       })
