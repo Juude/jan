@@ -7,12 +7,14 @@ interface UseLlamacppDeviceGpusResult {
   loading: boolean
   error: Error | null
   toggleDeviceActive: (id: string) => void
+  refetch: () => void
 }
 
 export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
   const [devices, setDevices] = useState<DeviceList[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const [refetchTrigger, setRefetchTrigger] = useState(0)
 
   const toggleDeviceActive = (id: string) => {
     setDevices((prevDevices) => {
@@ -22,6 +24,10 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
       localStorage.setItem(localStorageKey.llamacppDeviceGpus, JSON.stringify(updatedDevices))
       return updatedDevices
     })
+  }
+
+  const refetch = () => {
+    setRefetchTrigger(prev => prev + 1)
   }
 
   useEffect(() => {
@@ -68,7 +74,7 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [refetchTrigger])
 
-  return { devices, loading, error, toggleDeviceActive }
+  return { devices, loading, error, toggleDeviceActive, refetch }
 }

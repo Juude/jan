@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AIEngine,
   EngineManager,
@@ -221,6 +222,22 @@ export const startModel = async (
   if (!engine) return undefined
 
   if ((await engine.getLoadedModels()).includes(model)) return undefined
+
+  // Check and log active devices for llamacpp provider
+  if (provider.provider === 'llamacpp') {
+    try {
+      const persistedDevices = localStorage.getItem('llamacpp-device-gpus')
+      if (persistedDevices) {
+        const devices = JSON.parse(persistedDevices)
+        const activeDevices = devices.filter((device: any) => device.active)
+        console.log('Active devices when starting model:', activeDevices)
+      } else {
+        console.log('No device preferences found in localStorage')
+      }
+    } catch (error) {
+      console.error('Error reading device preferences:', error)
+    }
+  }
 
   // Find the model configuration to get settings
   const modelConfig = provider.models.find((m) => m.id === model)

@@ -39,7 +39,7 @@ import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
 import { predefinedProviders } from '@/consts/providers'
 import { useModelLoad } from '@/hooks/useModelLoad'
-import { useLlamacppDevices } from '@/hooks/useLlamacppDevices'
+import { useLlamacppDeviceGpus } from '@/hooks/useLlamacppDeviceGpus'
 
 // as route.threadsDetail
 export const Route = createFileRoute('/settings/providers/$providerName')({
@@ -55,6 +55,7 @@ export const Route = createFileRoute('/settings/providers/$providerName')({
 function ProviderDetail() {
   const { t } = useTranslation()
   const { setModelLoadError } = useModelLoad()
+  const { refetch: refetchDeviceGpus } = useLlamacppDeviceGpus()
   const steps = [
     {
       target: '.first-step-setup-remote-provider',
@@ -365,11 +366,9 @@ function ProviderDetail() {
                                     ).value = ''
                                   }
 
-                                  // Reset llamacpp device activations when backend version changes
                                   if (providerName === 'llamacpp') {
-                                    const { setActivatedDevices } =
-                                      useLlamacppDevices.getState()
-                                    setActivatedDevices([])
+                                    // Refetch device GPUs to get updated hardware info
+                                    refetchDeviceGpus()
                                   }
                                 }
 
