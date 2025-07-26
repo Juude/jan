@@ -105,17 +105,6 @@
     }
   },
   {
-    "key": "device",
-    "title": "Devices for Offload",
-    "description": "Comma-separated list of devices to use for offloading (e.g., 'CUDA0', 'CUDA0,CUDA1'). Leave empty to use default/CPU only.",
-    "controllerType": "input",
-    "controllerProps": {
-      "value": "",
-      "placeholder": "CUDA0",
-      "type": "text"
-    }
-  },
-  {
     "key": "split_mode",
     "title": "GPU Split Mode",
     "description": "How to split the model across multiple GPUs.",

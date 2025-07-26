@@ -17,6 +17,7 @@ import { windowKey } from '@/constants/windows'
 import { toNumber } from '@/utils/number'
 import { useModelProvider } from '@/hooks/useModelProvider'
 import { stopAllModels } from '@/services/models'
+import { useLlamacppDeviceGpus } from '@/hooks/useLlamacppDeviceGpus'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Route = createFileRoute(route.settings.hardware as any)({
@@ -33,6 +34,9 @@ function Hardware() {
     updateSystemUsage,
     pollingPaused,
   } = useHardware()
+
+  const { devices, loading, error, toggleDeviceActive } =
+    useLlamacppDeviceGpus()
 
   const { providers } = useModelProvider()
   const llamacpp = providers.find((p) => p.provider === 'llamacpp')
@@ -364,6 +368,66 @@ function Hardware() {
                                 checked={activatedDevices.has(device.id)}
                                 onCheckedChange={() => {
                                   toggleDevice(device.id)
+                                  stopAllModels()
+                                }}
+                              />
+                            </div>
+                          }
+                        />
+                        <div className="mt-3">
+                          <CardItem
+                            title={t('settings:hardware.vram')}
+                            actions={
+                              <span className="text-main-view-fg/80">
+                                {formatMegaBytes(device.free)}{' '}
+                                {t('settings:hardware.freeOf')}{' '}
+                                {formatMegaBytes(device.mem)}
+                              </span>
+                            }
+                          />
+                        </div>
+                      </Card>
+                    ))
+                  ) : (
+                    <CardItem title="No devices found" actions={<></>} />
+                  )}
+                </Card>
+              )}
+
+              {/* Llamacpp New Devices Information */}
+              {devices && devices.length > 0 && (
+                <Card title="GPUs">
+                  {loading ? (
+                    <CardItem title="Loading devices..." actions={<></>} />
+                  ) : llamacppDevicesError ? (
+                    <CardItem
+                      title="Error loading devices"
+                      actions={
+                        <span className="text-destructive text-sm">
+                          {error?.message}
+                        </span>
+                      }
+                    />
+                  ) : devices.length > 0 ? (
+                    devices.map((device, index) => (
+                      <Card key={index}>
+                        <CardItem
+                          title={device.name}
+                          actions={
+                            <div className="flex items-center gap-4">
+                              {/* <div className="flex flex-col items-end gap-1">
+                            <span className="text-main-view-fg/80 text-sm">
+                              ID: {device.id}
+                            </span>
+                            <span className="text-main-view-fg/80 text-sm">
+                              Memory: {formatMegaBytes(device.mem)} /{' '}
+                              {formatMegaBytes(device.free)} free
+                            </span>
+                          </div> */}
+                              <Switch
+                                checked={device.active}
+                                onCheckedChange={() => {
+                                  toggleDeviceActive(device.id)
                                   stopAllModels()
                                 }}
                               />
