@@ -350,23 +350,11 @@ function ProviderDetail() {
                                   updateObj.base_url = newValue
                                 }
 
-                                // Reset device setting to empty when backend version changes
                                 if (settingKey === 'version_backend') {
-                                  const deviceSettingIndex =
-                                    newSettings.findIndex(
-                                      (s) => s.key === 'device'
-                                    )
-
-                                  if (deviceSettingIndex !== -1) {
-                                    ;(
-                                      newSettings[deviceSettingIndex]
-                                        .controller_props as {
-                                        value: string
-                                      }
-                                    ).value = ''
-                                  }
-
                                   if (providerName === 'llamacpp') {
+                                    console.log(
+                                      'llamacpp device GPUs changed, refetching...'
+                                    )
                                     // Refetch device GPUs to get updated hardware info
                                     refetchDeviceGpus()
                                   }

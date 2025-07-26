@@ -40,6 +40,28 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
           const persistedDevices = localStorage.getItem(localStorageKey.llamacppDeviceGpus)
           let devicesWithState: DeviceList[]
           
+          // If API returns empty array, keep existing localStorage data
+          if (devs.length === 0) {
+            if (persistedDevices) {
+              try {
+                const parsed = JSON.parse(persistedDevices) as DeviceList[]
+                setDevices(parsed)
+                setLoading(false)
+                return
+              } catch {
+                // If parsing fails, set empty array
+                setDevices([])
+                setLoading(false)
+                return
+              }
+            } else {
+              // No persisted data and empty API response
+              setDevices([])
+              setLoading(false)
+              return
+            }
+          }
+          
           if (persistedDevices) {
             try {
               const parsed = JSON.parse(persistedDevices) as DeviceList[]
