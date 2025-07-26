@@ -30,10 +30,33 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
     setRefetchTrigger(prev => prev + 1)
   }
 
+  const fetchDevicesWithRetry = async (retries = 3, delay = 2000): Promise<DeviceList[]> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const devices = await getLlamacppDevices()
+        if (devices.length > 0) {
+          return devices
+        }
+        // If empty array and not the last retry, wait and try again
+        if (i < retries - 1) {
+          console.log(`Device fetch returned empty, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+        }
+      } catch (error) {
+        if (i === retries - 1) {
+          throw error
+        }
+        console.log(`Device fetch failed, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+    return []
+  }
+
   useEffect(() => {
     let isMounted = true
     setLoading(true)
-    getLlamacppDevices()
+    fetchDevicesWithRetry()
       .then((devs) => {
         if (isMounted) {
           // Load persisted device states from localStorage

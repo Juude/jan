@@ -353,10 +353,13 @@ function ProviderDetail() {
                                 if (settingKey === 'version_backend') {
                                   if (providerName === 'llamacpp') {
                                     console.log(
-                                      'llamacpp device GPUs changed, refetching...'
+                                      'llamacpp backend version changed, waiting for backend to initialize...'
                                     )
-                                    // Refetch device GPUs to get updated hardware info
-                                    refetchDeviceGpus()
+                                    // Wait for backend to download and initialize before refetching devices
+                                    setTimeout(() => {
+                                      console.log('Refetching device GPUs after backend initialization delay')
+                                      refetchDeviceGpus()
+                                    }, 3000) // 3 second delay to allow backend to initialize
                                   }
                                 }
 
