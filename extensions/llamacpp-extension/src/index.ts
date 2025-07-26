@@ -1202,6 +1202,8 @@ export default class llamacpp_extension extends AIEngine {
     if (cfg.batch_size > 0) args.push('--batch-size', String(cfg.batch_size))
     if (cfg.ubatch_size > 0) args.push('--ubatch-size', String(cfg.ubatch_size))
     if (cfg.device.length > 0) args.push('--device', cfg.device)
+    else args.push('--device', 'none')
+
     if (cfg.split_mode.length > 0) args.push('--split-mode', cfg.split_mode)
     if (cfg.main_gpu !== undefined)
       args.push('--main-gpu', String(cfg.main_gpu))
