@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getLlamacppDevices, DeviceList } from '@/services/hardware'
 import { localStorageKey } from '@/constants/localStorage'
+import { events } from '@janhq/core'
 
 interface UseLlamacppDeviceGpusResult {
   devices: DeviceList[]
@@ -31,6 +32,51 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
 
   const refetch = () => {
     setRefetchTrigger((prev) => prev + 1)
+  }
+
+  const updateDevices = (newDevices: DeviceList[]) => {
+    setDevices((prevDevices) => {
+      // Check if device IDs are different
+      const prevIds = prevDevices.map(d => d.id).sort()
+      const newIds = newDevices.map(d => d.id).sort()
+      
+      // If IDs are the same, no need to update
+      if (prevIds.length === newIds.length && prevIds.every((id, index) => id === newIds[index])) {
+        return prevDevices
+      }
+
+      // Load persisted device states from localStorage
+      const persistedDevices = localStorage.getItem(localStorageKey.llamacppDeviceGpus)
+      let devicesWithState: DeviceList[]
+
+      if (persistedDevices) {
+        try {
+          const parsed = JSON.parse(persistedDevices) as DeviceList[]
+          // Merge persisted states with new devices
+          devicesWithState = newDevices.map((device) => {
+            const persistedDevice = parsed.find((p) => p.id === device.id)
+            return {
+              ...device,
+              active: persistedDevice?.active ?? true,
+            }
+          })
+        } catch {
+          // If parsing fails, use default active state
+          devicesWithState = newDevices.map((d) => ({ ...d, active: true }))
+        }
+      } else {
+        // Set all devices' active to true by default
+        devicesWithState = newDevices.map((d) => ({ ...d, active: true }))
+      }
+
+      // Update localStorage
+      localStorage.setItem(
+        localStorageKey.llamacppDeviceGpus,
+        JSON.stringify(devicesWithState)
+      )
+
+      return devicesWithState
+    })
   }
 
   useEffect(() => {
@@ -105,6 +151,22 @@ export function useLlamacppDeviceGpus(): UseLlamacppDeviceGpusResult {
       isMounted = false
     }
   }, [refetchTrigger])
+
+  // Listen for devicesUpdated event from the backend
+  useEffect(() => {
+    const handleDevicesUpdated = (event: { devices: DeviceList[] }) => {
+      console.log('Devices updated event received:', event)
+      updateDevices(event.devices)
+    }
+
+    // Subscribe to the devicesUpdated event
+    events.on('devicesUpdated', handleDevicesUpdated)
+
+    // Cleanup subscription on unmount
+    return () => {
+      events.off('devicesUpdated', handleDevicesUpdated)
+    }
+  }, [])
 
   return { devices, loading, error, toggleDeviceActive, refetch }
 }
