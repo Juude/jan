@@ -1,0 +1,1 @@
+class n{async setTheme(e){console.log("Setting theme in web mode:",e),e?document.documentElement.setAttribute("data-theme",e):document.documentElement.removeAttribute("data-theme")}getCurrentWindow(){return{setTheme:e=>this.setTheme(e)}}}export{n as WebThemeService};

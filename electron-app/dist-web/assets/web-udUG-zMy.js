@@ -1,0 +1,1 @@
+class o{async onOpenUrl(n){const e=()=>{const r=window.location.href;n([r])};return window.addEventListener("hashchange",e),()=>{window.removeEventListener("hashchange",e)}}async getCurrent(){return[window.location.href]}}export{o as WebDeepLinkService};
