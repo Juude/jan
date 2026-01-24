@@ -1,1 +1,0 @@
-import{invoke as r}from"./core-Dv9Wrr_v.js";async function o(n,e){await r("plugin:opener|open_url",{url:n,with:e})}async function t(n){return r("plugin:opener|reveal_item_in_dir",{paths:typeof n=="string"?[n]:n})}export{o,t as r};

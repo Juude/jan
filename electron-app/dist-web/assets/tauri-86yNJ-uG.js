@@ -1,1 +1,0 @@
-import{emit as o,listen as i}from"@tauri-apps/api/event";import{V as s}from"./index-DfM3S9dX.js";class u extends s{async emit(t,e,n){try{await o(t,e)}catch(r){throw console.error("Error emitting Tauri event:",r),r}}async listen(t,e,n){try{return await i(t,e)}catch(r){return console.error("Error listening to Tauri event:",r),()=>{}}}}export{u as TauriEventsService};

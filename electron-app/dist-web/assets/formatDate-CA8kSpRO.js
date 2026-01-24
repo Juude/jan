@@ -1,1 +1,0 @@
-const o=(e,t)=>{const r=t?.includeTime??!0,n={year:"numeric",day:"numeric"};return r?new Date(e).toLocaleString("en-US",{...n,month:"short",hour:"numeric",minute:"numeric",hour12:!0}):new Date(e).toLocaleDateString("en-US",{...n,month:"long"})};export{o as f};

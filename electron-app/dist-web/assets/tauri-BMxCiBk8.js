@@ -1,1 +1,0 @@
-import{r as i}from"./index-CNozlqMw.js";import{a3 as a}from"./index-DfM3S9dX.js";import"./core-Dv9Wrr_v.js";class m extends a{async revealItemInDir(e){try{await i(e)}catch(r){throw console.error("Error revealing item in directory in Tauri:",r),r}}}export{m as TauriOpenerService};
