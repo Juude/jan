@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch Web App (Browser)",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:3001",
+      "webRoot": "${workspaceFolder}/web-app",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${webRoot}/*"
+      }
+    },
+    {
+      "name": "Tauri: Debug Backend (Rust)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/src-tauri/target/debug/Jan",
+      "args": [],
+      "cwd": "${workspaceFolder}/src-tauri",
+      "env": {
+        "RUST_BACKTRACE": "1"
+      },
+      "preLaunchTask": "build:debug"
+    }
+  ]
+}
