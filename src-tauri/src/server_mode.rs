@@ -292,3 +292,48 @@ async fn dispatch_command<R: Runtime>(command: &str, args: Value, app_handle: &A
         _ => Err(format!("Unknown command: {}", command))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_get_arg_valid() {
+        let args = json!({
+            "key": "value",
+            "number": 123
+        });
+        let val = get_arg(&args, "key").unwrap();
+        assert_eq!(val, "value");
+    }
+
+    #[test]
+    fn test_get_arg_missing() {
+        let args = json!({
+            "key": "value"
+        });
+        let result = get_arg(&args, "missing");
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Missing argument: missing");
+    }
+
+    #[test]
+    fn test_get_string_arg_valid() {
+        let args = json!({
+            "key": "value"
+        });
+        let val = get_string_arg(&args, "key").unwrap();
+        assert_eq!(val, "value");
+    }
+
+    #[test]
+    fn test_get_string_arg_invalid_type() {
+        let args = json!({
+            "key": 123
+        });
+        let result = get_string_arg(&args, "key");
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err(), "Argument key must be a string");
+    }
+}
