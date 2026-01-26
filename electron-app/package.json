@@ -1,0 +1,54 @@
+{
+  "name": "@jan/electron-app",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "yarn copy:web && tsc",
+    "copy:web": "rimraf dist-web && cpx \"../web-app/dist-web/**/*\" \"dist-web/\"",
+    "dev": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "cpx": "^1.5.0",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "rimraf": "^3.0.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "electron-is-dev": "^3.0.1",
+    "get-port": "^7.1.0"
+  },
+  "build": {
+    "appId": "ai.jan.electron",
+    "productName": "Jan Electron",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-web/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../src-tauri/target/release/jan-app",
+        "to": "bin/jan-app"
+      }
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    }
+  }
+}

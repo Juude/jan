@@ -63,3 +63,8 @@ src-tauri/resources/
 test-data
 llm-docs
 .claude/agents
+electron-app/dist-web/
+electron-app/dist/
+dist-web/
+**/dist/
+**/dist-web/

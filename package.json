@@ -6,7 +6,8 @@
     "packages": [
       "core",
       "web-app",
-      "extensions-web"
+      "extensions-web",
+      "electron-app"
     ]
   },
   "scripts": {
@@ -25,6 +26,8 @@
     "build:web-app": "yarn build:extensions-web && yarn workspace @janhq/web-app install && yarn workspace @janhq/web-app build:web",
     "serve:web-app": "yarn workspace @janhq/web-app serve:web",
     "build:serve:web-app": "yarn build:web-app && yarn serve:web-app",
+    "dev:electron": "yarn workspace @jan/electron-app dev",
+    "build:electron": "yarn workspace @jan/electron-app build && yarn workspace @jan/electron-app dist",
     "dev:tauri": "yarn build:icon && yarn copy:assets:tauri && cross-env IS_CLEAN=true tauri dev",
     "dev:ios": "yarn copy:assets:mobile && RUSTC_WRAPPER= cross-env IS_IOS=true yarn tauri ios dev --features mobile",
     "dev:android": "yarn copy:assets:mobile && cross-env IS_ANDROID=true yarn tauri android dev --features mobile",

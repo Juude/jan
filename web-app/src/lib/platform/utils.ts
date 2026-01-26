@@ -4,7 +4,12 @@ declare const IS_WEB_APP: boolean
 declare const IS_IOS: boolean
 declare const IS_ANDROID: boolean
 
+export const isPlatformElectron = (): boolean => {
+  return typeof (window as any).electronAPI !== 'undefined'
+}
+
 export const isPlatformTauri = (): boolean => {
+  if (isPlatformElectron()) return false
   if (typeof IS_WEB_APP === 'undefined') {
     return true
   }
@@ -27,6 +32,7 @@ export const isIOS = (): boolean => isPlatformIOS()
 export const isAndroid = (): boolean => isPlatformAndroid()
 
 export const getCurrentPlatform = (): Platform => {
+  if (isPlatformElectron()) return 'electron'
   if (isPlatformIOS()) return 'ios'
   if (isPlatformAndroid()) return 'android'
   return isPlatformTauri() ? 'tauri' : 'web'

@@ -1,4 +1,5 @@
 mod core;
+mod server_mode;
 use core::{
     app::commands::get_jan_data_folder_path,
     downloads::models::DownloadManagerState,
@@ -199,6 +200,24 @@ pub fn run() {
 
             setup_mcp(app);
             setup::setup_theme_listener(app)?;
+
+            // Check for Electron mode
+            let args: Vec<String> = std::env::args().collect();
+            if args.contains(&"--electron".to_string()) {
+                log::info!("Starting in Electron server mode");
+                let app_handle = app.handle().clone();
+                tauri::async_runtime::spawn(async move {
+                    server_mode::start_app_server(app_handle).await;
+                });
+
+                // Hide the main window if it exists
+                if let Some(window) = app.handle().get_webview_window("main") {
+                    if let Err(e) = window.hide() {
+                        log::error!("Failed to hide window: {}", e);
+                    }
+                }
+            }
+
             Ok(())
         })
         .build(tauri::generate_context!())
